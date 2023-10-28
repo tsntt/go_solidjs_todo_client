@@ -1,0 +1,10 @@
+#root {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 300;
+}
+.font-semibold {
+  font-weight: 500;
+}
+.font-bold {
+  font-weight: 700;
+}
