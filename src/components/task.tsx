@@ -1,17 +1,14 @@
 import { Show } from "solid-js";
-// import { Task } from "../entities/task"
 import { useTasks } from "../usecases/useTasks";
 import { isLate, isSoon, isTomorrow, isToday, inAWeek } from "../util/utils"
 
 export function TaskItem(props: any) {
-    const Months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    const Days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-
     const { changeStatus, mutate } = useTasks();
 
-    var date = new Date(Date.parse(props.item.due))
-    var due = {
-        dayIdx: date.getDay(),
+    const date = new Date(Date.parse(props.item.due))
+    const due = {
+        dayName: date.toLocaleDateString('en', { weekday: 'long' }),
+        monthName: date.toLocaleDateString('en', { month: 'long' }),
         day: date.getDate(),
         month: date.getMonth(),
         hour: date.getHours(),
@@ -20,33 +17,18 @@ export function TaskItem(props: any) {
 
     function _contextMenu(e:Event) {
         e.preventDefault()
+
         props.setCtxMenu(true)
         props.setTask(props.item)
 
-        const CtxMenu = document.getElementById('ctxMenu')
-        const cRect = CtxMenu?.getBoundingClientRect()
+        const ctxMenu = document.getElementById('ctxMenu')
+        const ctxMenuRect = ctxMenu?.getBoundingClientRect()
         const wRect = document.body.getBoundingClientRect()
 
-        let top:number
-        let left:number
-
-        if (e.y > (cRect.height*1.3)) {
-            // up
-            top = e.y - cRect.height + window.scrollY 
-        } else {
-            // down
-            top = e.y + window.scrollY 
-        }
-
-        if ((wRect.width-e.x) > (cRect.width*1.3)) {
-            // right
-            left = e.x
-        } else {
-            // left
-            left = e.x - cRect.width
-        }
-
-        CtxMenu.style.transform = `translate(${left}px, ${top}px)`
+        const top:number = e.y > (ctxMenuRect.height*1.3) ? e.y - ctxMenuRect.height + window.scrollY : e.y + window.scrollY 
+        const left:number = (wRect.width-e.x) > (ctxMenuRect.width*1.3) ? e.x : e.x - ctxMenuRect.width
+        
+        ctxMenu.style.transform = `translate(${left}px, ${top}px)`
     }
 
     return (
@@ -55,7 +37,7 @@ export function TaskItem(props: any) {
                 <div>
                     <h6 class={"text-2xl antialiased " + (props.item.status ? 'line-through text-gray-400' : 'text-gray-900')}>{props.item.content}</h6>
                     <Show when={!props.item.status}>
-                        <p class="text-lg text-gray-600 antialiased">Crypto wallet design</p>
+                        <p class="text-lg text-gray-600 antialiased">{props.item.description}</p>
                     </Show>
                 </div>
                 <div>
@@ -72,9 +54,9 @@ export function TaskItem(props: any) {
                     isTomorrow(props.item.due) ?
                         <p class="pt-4 text-gray-400 text-lg antialiased"><b>Tomorow</b> {due.hour < 10 ? `0${due.hour}` : due.hour}:{due.minutes < 10 ? `0${due.minutes}` : due.minutes}</p> :
                     inAWeek(props.item.due) ? 
-                        <p class="pt-4 text-gray-400 text-lg antialiased"><b>{Days[due.dayIdx]}</b> {due.hour < 10 ? `0${due.hour}` : due.hour}:{due.minutes < 10 ? `0${due.minutes}` : due.minutes}</p> 
+                        <p class="pt-4 text-gray-400 text-lg antialiased"><b>{due.dayName}</b> {due.hour < 10 ? `0${due.hour}` : due.hour}:{due.minutes < 10 ? `0${due.minutes}` : due.minutes}</p> 
                         :
-                        <p class="pt-4 text-gray-400 text-lg antialiased">{Months[due.month]}, {due.day < 10 ? `0${due.day}` : due.day} - {due.hour < 10 ? `0${due.hour}` : due.hour}:{due.minutes < 10 ? `0${due.minutes}` : due.minutes}</p>
+                        <p class="pt-4 text-gray-400 text-lg antialiased">{due.monthName}, {due.day < 10 ? `0${due.day}` : due.day} - {due.hour < 10 ? `0${due.hour}` : due.hour}:{due.minutes < 10 ? `0${due.minutes}` : due.minutes}</p>
                     }
                     { isSoon(props.item.due)?
                         <span class="mt-4 px-3 py-1 bg-yellow-200 rounded-full text-yellow-500 font-semibold text-xs">Soon</span> :

@@ -2,17 +2,13 @@ import { Show } from "solid-js";
 import { useTasks } from "../usecases/useTasks";
 
 export function ContextMenu(props:any) {
-    const { remove, edit } = useTasks();
-
-    function editTask(e: Event) {
-        console.log(props.task())
-    }
+    const { remove } = useTasks();
 
     return (
         <Show when={props.ctx()}>
             <nav id="ctxMenu" class="absolute top-0 left-0 bg-gray-50 border border-gray-300 rounded-lg shadow-lg">
                 <ul>
-                    <li onClick={editTask} class="text-gray-600 hover:bg-blue-600 hover:text-white pl-4 pr-6 font-semibold py-2 rounded-t-lg cursor-pointer">
+                    <li onClick={() => props.setEditable(true)} class="text-gray-600 hover:bg-blue-600 hover:text-white pl-4 pr-6 font-semibold py-2 rounded-t-lg cursor-pointer">
                         <a class="flex justify-items-center">
                             <svg class="mr-2 stroke-current" fill="none" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M14 6L8 12V16H12L18 10M14 6L17 3L21 7L18 10M14 6L18 10M10 4L4 4L4 20L20 20V14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
                             <span>Edit</span>

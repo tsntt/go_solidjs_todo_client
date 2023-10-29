@@ -65,7 +65,7 @@ export function CreateRestApiHook<T>(customActions: customAction[], URL:string |
       async function edit(itemId: string, item: Partial<T>) {
           try {
               const res = await fetch( typeof URL === "string" ? `${URL}/${itemId}` : `${URL.edit}/${itemId}`, {
-                  method: "PATCH",
+                  method: "PUT",
                   body: JSON.stringify(item),
                   headers: { "Content-Type": "application/json" }
               });

@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, createEffect } from "solid-js";
 import { useTasks } from "../usecases/useTasks";
 import { Task } from "../entities/task";
 
@@ -12,32 +12,60 @@ export function FormAddTask(props: any) {
     const [newDate, setNewDate] = createSignal(DAYNOW)
     const [newTime, setNewTime] = createSignal(TIMENOW)
 
-    const { add } = useTasks();
+    const { add, edit } = useTasks();
 
     function _discard(e: Event) {
         e.preventDefault()
         props.setShow(false)
+        props.setEditable(false)
     }
 
     function _addItem(e: Event) {
         e.preventDefault()
 
         let datetime = Date.parse(`${newDate()}T${newTime()}:00`)
-        console.log(datetime)
 
         const task:Task = {
             content: newItem(),
+            description: newDescription(),
             due: datetime.toString(),
         }
 
-        add(task)
+        // id edit do thing
+        if (props.edit()) {
+            const t = props.currentTask()
+            edit(t.id, task)
+        } else {
+            add(task)
+        }
 
         props.setShow(false)
+        props.setEditable(false)
         
         setNewItem('')
+        setNewDescription('')
         setNewDate(DAYNOW)
         setNewTime(TIMENOW)
     }
+
+    createEffect(() => {
+        if (props.edit()) {
+            let t = props.currentTask()
+            let [date, time] = t.due.split('T')
+
+            time = time.substr(0, 5)
+
+            setNewItem(t.content)
+            setNewDescription(t.description)
+            setNewTime(time)
+            setNewDate(date)
+        } else {
+            setNewItem('')
+            setNewDescription('')
+            setNewDate(DAYNOW)
+            setNewTime(TIMENOW)
+        }
+    })
 
     return (
         <div class={props.show() ? "w-full h-full inset-0 fixed flex items-center" : "w-full h-full inset-0 fixed flex items-center hidden"}>
