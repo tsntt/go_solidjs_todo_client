@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
-import { useTasks } from "../../useTasks";
-import { Task } from "../Task/Task";
+import { useTasks } from "../usecases/useTasks";
+import { Task } from "../entities/task";
 
 export function FormAddTask(props: any) {
     const NOW = new Date()
@@ -8,6 +8,7 @@ export function FormAddTask(props: any) {
     const TIMENOW = `${NOW.getHours() == 23 ? '00' : NOW.getHours()+1}:00`
 
     const [newItem, setNewItem] = createSignal('')
+    const [newDescription, setNewDescription] = createSignal('')
     const [newDate, setNewDate] = createSignal(DAYNOW)
     const [newTime, setNewTime] = createSignal(TIMENOW)
 
@@ -54,10 +55,10 @@ export function FormAddTask(props: any) {
 
                         <fieldset class="flex flex-col mb-4">
                             <label class="text-md text-gray-900" for="description">Description:</label>
-                            <textarea class="border rounded-lg p-2" name="description" id="description" cols="30" rows="5"></textarea>
+                            <input value={newDescription()} onChange={(e) => {setNewDescription(e.target.value)}} class="border rounded-lg p-2" type="text" name="description" id="description" />
                         </fieldset>
 
-                        <div class="flex flex-row columns-2 gap-3 columns-2 mb-6">
+                        <div class="flex flex-row columns-2 gap-3 mb-6">
                             <fieldset class="flex flex-col">
                                 <label class="text-md text-gray-900" for="date">Date:</label>
                                 <input value={newDate()} min={DAYNOW} onChange={(e) => {setNewDate(e.target.value)}} class="border rounded-lg p-2" type="date" name="date" id="date" />

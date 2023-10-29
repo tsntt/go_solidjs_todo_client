@@ -1,20 +1,13 @@
 import { Show } from "solid-js";
-import { useTasks } from "../../useTasks";
-import { isLate, isSoon, isTomorrow, isToday, inAWeek } from "../../utils"
-
-export type Task = {
-    id?:number;
-    content: string;
-    due: string;
-    status?: boolean;
-    created_at?: string;
-}
+// import { Task } from "../entities/task"
+import { useTasks } from "../usecases/useTasks";
+import { isLate, isSoon, isTomorrow, isToday, inAWeek } from "../util/utils"
 
 export function TaskItem(props: any) {
     const Months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     const Days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
-    const { changeStatus } = useTasks();
+    const { changeStatus, mutate } = useTasks();
 
     var date = new Date(Date.parse(props.item.due))
     var due = {
@@ -28,6 +21,7 @@ export function TaskItem(props: any) {
     function _contextMenu(e:Event) {
         e.preventDefault()
         props.setCtxMenu(true)
+        props.setTask(props.item)
 
         const CtxMenu = document.getElementById('ctxMenu')
         const cRect = CtxMenu?.getBoundingClientRect()
@@ -65,7 +59,7 @@ export function TaskItem(props: any) {
                     </Show>
                 </div>
                 <div>
-                    <div onClick={() => { changeStatus(props.item.id) }} class={"w-8 h-8 rounded-full hover:border-blue-600 hover:bg-blue-600 border border-gray-300 cursor-pointer transition-colors ease-in-out " + (props.item.status ? 'bg-gray-300': '')}>
+                    <div onClick={() => { changeStatus(props.item.id, mutate) }} class={"w-8 h-8 rounded-full hover:border-blue-600 hover:bg-blue-600 border border-gray-300 cursor-pointer transition-colors ease-in-out " + (props.item.status ? 'bg-gray-300': '')}>
                         <p class="text-2xl text-white w-full text-center antialiased">✓</p>
                     </div>
                 </div>
@@ -73,18 +67,18 @@ export function TaskItem(props: any) {
             <Show when={!props.item.status}>
                 <hr />
                 <div class="flex flex-row justify-between items-center">
-                    {isToday(props.item) ?
+                    {isToday(props.item.due) ?
                         <p class="pt-4 text-gray-400 text-lg antialiased"><b>Today</b> {due.hour < 10 ? `0${due.hour}` : due.hour}:{due.minutes < 10 ? `0${due.minutes}` : due.minutes}</p> :
-                    isTomorrow(props.item) ?
+                    isTomorrow(props.item.due) ?
                         <p class="pt-4 text-gray-400 text-lg antialiased"><b>Tomorow</b> {due.hour < 10 ? `0${due.hour}` : due.hour}:{due.minutes < 10 ? `0${due.minutes}` : due.minutes}</p> :
-                    inAWeek(props.item) ? 
+                    inAWeek(props.item.due) ? 
                         <p class="pt-4 text-gray-400 text-lg antialiased"><b>{Days[due.dayIdx]}</b> {due.hour < 10 ? `0${due.hour}` : due.hour}:{due.minutes < 10 ? `0${due.minutes}` : due.minutes}</p> 
                         :
                         <p class="pt-4 text-gray-400 text-lg antialiased">{Months[due.month]}, {due.day < 10 ? `0${due.day}` : due.day} - {due.hour < 10 ? `0${due.hour}` : due.hour}:{due.minutes < 10 ? `0${due.minutes}` : due.minutes}</p>
                     }
-                    { isSoon(props.item)?
+                    { isSoon(props.item.due)?
                         <span class="mt-4 px-3 py-1 bg-yellow-200 rounded-full text-yellow-500 font-semibold text-xs">Soon</span> :
-                    isLate(props.item)?
+                    isLate(props.item.due)?
                         <span class="mt-4 px-3 py-1 bg-red-200 rounded-full text-red-400 font-semibold text-xs">Late</span> :
                         ''
                     }
